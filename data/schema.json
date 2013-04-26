@@ -1,0 +1,76 @@
+{
+    "experiment_id" : 1,
+
+    "header" : {
+        "start_time" : "start time",
+        "end_time" : "end time",
+        "owner" : {
+            "firstname" : "Oliver",
+            "lastname" : "Twist"
+        },
+        "research_group" : {
+            "title" : "NASA Monkeys",
+            "owner" : {
+                "firstname" : "Bruce",
+                "lastname" : "Willis"
+            }
+        }
+    },
+
+    "scenario" : {
+        "name" : "scenario name",
+        "description" : "description",
+        "owner" : {
+            "firstname" : "Olivia",
+            "lastname" : "Dunham"
+        }
+    },
+
+    "subject" : {
+        "name" : "subject name",
+        "gender" : "gender",
+        "date of birth" : "ddmmyyy",
+        "laterality" : "bigfootness!",
+        "group" : {
+            "title" : "rabbits",
+            "description" : "hope they last longer than the previous ones"
+        }
+    },
+
+    "configuration" : {
+        "temperature" : 100,
+        "weather" : {
+            "title" : "pocasi",
+            "note" : "opravdu hnusne prselo"
+        },
+        "environment note" : "ale priroda opravdu nadherna, proste nadherna",
+        "artefact" : {
+            "compensation" : "gimme all your money!",
+            "reject condition" : "weve got more guns"
+        },
+        "electrode system" : "system title",
+        "digitalisation" : {
+            "sampling_rate" : "666",
+            "gain" : "1.2"
+        },
+        "software" : [
+            {"title" : "T602"},
+            {"title" : "Batlik"},
+            {"title" : "Prehistorc"}
+        ],
+        "hardware" : [
+            {"title" : "Soundblaster PRO", "type" : "audio"},
+            {"title" : "VooDoo", "type" : "video"}
+        ],
+        "project_type" : [
+            {"title" : "Lets blow up the whole world - kind of - project"},
+            {"title" : "School Paper"}
+        ],
+        "pharmaceutical" : [
+            {"title" : "Blind"},
+            {"title" : "Deaf"}
+        ]
+    }
+
+
+}

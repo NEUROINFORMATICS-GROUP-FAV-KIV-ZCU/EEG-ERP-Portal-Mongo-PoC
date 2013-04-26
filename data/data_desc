@@ -1,0 +1,38 @@
+10 000 persons
+--Firstname1 - 100
+--Lastname1 - 100
+--laterality - odd/even
+--date of birth - TODO
+
+100 research groups
+--by lastname
+
+200 subject groups
+--2 per res. group
+
+100 000 scenarios
+--each owner (by lastname) has 10
+
+1000 weather
+--10 per group
+
+1000 artefact
+--compensation 1 - 1000
+--rej_condition 1 - 1000
+
+100 ElectrodeConf - ElectrodeSystem
+--title1-100
+
+100 Digitalization
+--gain 1 - 100
+--sampling rate 1 - 100
+
+100 SW
+
+100 HW
+
+100 project type
+
+100 pharma
+
+
