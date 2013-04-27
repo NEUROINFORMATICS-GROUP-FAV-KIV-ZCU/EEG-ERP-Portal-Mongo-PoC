@@ -43,14 +43,15 @@ class research_group:
 
 
 class scenario:
-    def __init__(self):
-        self.id = 0;
-        self.title = ""
-        self.description = ""
-        self.owner = person()
+    def __init__(self, owner, group, title="", desc="", id=0):
+        self.id = id;
+        self.title = title
+        self.description = desc
+        self.owner = owner
+        self.group = group
 
     def __str__(self):
-        return "Scenario: " + str(self.id) + ", title: " + self.title + ", desc: " + self.description + ", owner: " + self.owner
+        return "Scenario: " + self.title + ", desc: " + self.description + ", owner: " + self.owner
 
 class artefact:
     def __init__(self):

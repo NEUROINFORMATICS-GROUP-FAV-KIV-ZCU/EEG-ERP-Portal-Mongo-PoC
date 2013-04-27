@@ -5,22 +5,29 @@ from data.classes import *
 def persons_to_matrix(persons=[]):
     ret = []
     for p in persons:
-        ret.append(person_to_touple(p))
+        ret.append(person_to_tuple(p))
 
     return ret
 
-def person_to_touple(p):
+def person_to_tuple(p):
     return str(p.firstname), str(p.lastname), str(p.gender), str(p.laterality), str(p.education_level_id)
 
 def groups_to_matrix(groups):
     ret = []
     for g in groups:
-        ret.append(res_group_to_touple(g))
+        ret.append(res_group_to_tuple(g))
 
     return ret
 
-def res_group_to_touple(rg):
+def res_group_to_tuple(rg):
     return str(rg.title), str(rg.desc), int(rg.owner.id)
 
-def data_to_json ():
-    return
+def scenarios_to_matrix(scenarios=[]):
+    ret = []
+    for s in scenarios:
+        ret.append(scenario_to_tuple(s))
+
+    return ret
+
+def scenario_to_tuple(s):
+    return str(s.title), str(s.description), str(s.owner.id), str(s.group.id)

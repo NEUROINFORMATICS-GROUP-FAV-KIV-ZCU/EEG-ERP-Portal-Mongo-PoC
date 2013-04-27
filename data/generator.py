@@ -33,3 +33,19 @@ def generate_research_groups(title_count, owners):
         groups.append(research_group(owners[own_index],title, desc))
 
     return groups
+
+def generate_scenarios(title_count_per_group, groups):
+    titleConst = "scenario"
+    descConst = "scenarioDescription"
+
+    scenarios = []
+    i = 0
+    for g in groups:
+        for j in range(0, title_count_per_group):
+            title = titleConst + str(i)
+            desc = descConst + str(i)
+
+            scenarios.append(scenario(g.owner, g, title, desc))
+            i += 1
+
+    return scenarios

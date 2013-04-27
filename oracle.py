@@ -17,6 +17,13 @@ research_group_attributes = "TITLE, DESCRIPTION, OWNER_ID"
 research_group_attributes_with_id = "RESEARCH_GROUP_ID, " + research_group_attributes
 research_group_insert = "INSERT INTO RESEARCH_GROUP(" + research_group_attributes +") VALUES(:1, :2, :3)"
 research_group_select_all = "SELECT " + research_group_attributes_with_id + " FROM RESEARCH_GROUP"
+research_group_select_by_id = person_select_all + " WHERE RESEARCH_GROUP_ID = :1"
+
+### SCENARIO QUERIES#######################################
+scenario_attributes = "TITLE, DESCRIPTION, OWNER_ID, RESEARCH_GROUP_ID"
+scenario_attributes_with_id = "SCENARIO_ID, " + scenario_attributes
+scenario_insert = "INSERT INTO SCENARIO(" + scenario_attributes + ") values (:1, :2, :3, :4)"
+scenario_select_all = "SELECT " + scenario_attributes_with_id + " FROM SCENARIO"
 
 ### GENERIC METHODS#########################################
 def connect():
@@ -89,3 +96,27 @@ def query_groups(query, parameters=[]):
         groups.append(research_group(owner, t[1], t[2], t[0]))
 
     return groups
+
+def query_group(query, parameters=[]):
+    t = fetch_one(query, parameters)
+    owner = query_person(person_select_by_id, [t[3]])
+    return research_group(owner, t[1], t[2], t[0])
+
+### SCENARIO METHODS########################################
+def save_scenarios(scenarios=[]):
+    insert(scenario_insert, ut.scenarios_to_matrix(scenarios))
+
+def query_scenarios(query, parameters=[]):
+    scenarios = []
+    for s in fetch_many(query, parameters):
+        owner = query_person(person_select_by_id, s[3])
+        group = query_group(research_group_select_by_id, s[4])
+        scenarios.append(scenario(owner, group, s[1], s[2], s[0]))
+
+    return scenarios
+
+def query_scenario(query, parameters=[]):
+    s = fetch_one(query, parameters)
+    owner = query_person(person_select_by_id, s[3])
+    group = query_group(research_group_select_by_id, s[4])
+    return scenario(owner, group, s[1], s[2], s[0])

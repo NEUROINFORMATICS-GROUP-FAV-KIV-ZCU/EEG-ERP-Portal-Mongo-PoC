@@ -10,8 +10,8 @@
 200 subject groups
 --2 per res. group
 
-100 000 scenarios
---each owner (by lastname) has 10
+1 000 scenarios
+--each owner (same as group owner) has 10
 
 1000 weather
 --10 per group
