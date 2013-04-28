@@ -10,38 +10,66 @@ person_attributes_with_id = "PERSON_ID, " + person_attributes
 person_insert = 'INSERT INTO PERSON(' + person_attributes + ') values(:1, :2, :3, :4, :5)'
 person_select_all = "SELECT "  + person_attributes_with_id + " FROM PERSON"
 person_select_by_id = person_select_all + " WHERE PERSON_ID = :1"
+person_select_by_lastname = person_select_all + " WHERE SURNAME = :1"
+person_select_by_firstname = person_select_all + " WHERE GIVENNAME = :1"
+person_clear = "DELETE FROM PERSON"
 
 ### RESEARCH GROUP QUERIES#################################
 research_group_attributes = "TITLE, DESCRIPTION, OWNER_ID"
 research_group_attributes_with_id = "RESEARCH_GROUP_ID, " + research_group_attributes
 research_group_insert = "INSERT INTO RESEARCH_GROUP(" + research_group_attributes +") VALUES(:1, :2, :3)"
 research_group_select_all = "SELECT " + research_group_attributes_with_id + " FROM RESEARCH_GROUP"
-research_group_select_by_id = person_select_all + " WHERE RESEARCH_GROUP_ID = :1"
+research_group_select_by_id = research_group_select_all + " WHERE RESEARCH_GROUP_ID = :1"
+research_group_clear = "DELETE FROM RESEARCH_GROUP"
+
+research_group_member_attributes = "PERSON_ID, RESEARCH_GROUP_ID, AUTHORITY"
+research_group_member_insert = "INSERT INTO RESEARCH_GROUP_MEMBERSHIP (" + research_group_member_attributes + ") VALUES (:1, :2, :3)"
 
 ### SCENARIO QUERIES#######################################
 scenario_attributes = "TITLE, DESCRIPTION, OWNER_ID, RESEARCH_GROUP_ID"
 scenario_attributes_with_id = "SCENARIO_ID, " + scenario_attributes
 scenario_insert = "INSERT INTO SCENARIO(" + scenario_attributes + ") values (:1, :2, :3, :4)"
 scenario_select_all = "SELECT " + scenario_attributes_with_id + " FROM SCENARIO"
+scenario_clear = "DELETE FROM SCENARIO"
 
 ### ARTEFACT QUERIES#######################################
 artefact_attributes = "COMPENSATION, REJECT_CONDITION"
 artefact_attributes_with_id = "ARTEFACT_ID, " + artefact_attributes
 artefact_insert = "INSERT INTO ARTEFACT(" + artefact_attributes + ") VALUES (:1, :2)"
 artefact_select_all = "SELECT " + artefact_attributes_with_id + " FROM ARTEFACT"
+artefact_clear = "DELETE FROM ARTEFACT"
 
-### GENERIC METHODS#########################################
+### COMPOSITE FUNCTIONS#######################################
+def clear_db():
+    clear_scenarios()
+    clear_groups()
+    clear_persons()
+    clear_artefacts()
+
+### GENERIC FUNCTIONS#########################################
 def connect():
     con = cx_Oracle.connect('DB2/db@127.0.0.1/DB')
     return con
 
-def insert(query, params=[]):
+def insert_many(query, params=[]):
     con = connect()
     cur = con.cursor()
     cur.bindarraysize = len(params)
 
     cur.prepare(query)
     cur.executemany(None, params)
+    con.commit()
+
+    cur.close()
+    con.close()
+
+def update(query, params=[]):
+    con = connect()
+    cur = con.cursor()
+    cur.bindarraysize = len(params)
+
+    cur.prepare(query)
+    cur.execute(None, params)
     con.commit()
 
     cur.close()
@@ -73,10 +101,9 @@ def fetch_one(query, params=[]):
 
     return res
 
-
-### PERSON METHODS##########################################
+### PERSON FUNCTIONS##########################################
 def save_persons(persons=[]):
-    insert(person_insert, ut.persons_to_matrix(persons))
+    insert_many(person_insert, ut.persons_to_matrix(persons))
 
 def query_persons(query, parameters=[]):
     persons = []
@@ -89,10 +116,16 @@ def query_person(query, parameters=[]):
     t = fetch_one(query, parameters)
     return  person(t[1], t[2], t[3], t[4], t[0])
 
-### RESEARCH GROUP METHODS###################################
+def clear_persons():
+    update(person_clear)
+
+### RESEARCH GROUP FUNCTIONS###################################
 
 def save_research_groups(groups=[]):
-    insert(research_group_insert, ut.groups_to_matrix(groups))
+    insert_many(research_group_insert, ut.groups_to_matrix(groups))
+
+def add_res_group_members(group, persons=[]):
+    insert_many(research_group_member_insert, ut.prepare_member_matrix(group, persons))
 
 def query_groups(query, parameters=[]):
     groups = []
@@ -107,9 +140,12 @@ def query_group(query, parameters=[]):
     owner = query_person(person_select_by_id, [t[3]])
     return research_group(owner, t[1], t[2], t[0])
 
-### SCENARIO METHODS########################################
+def clear_groups():
+    update(research_group_clear)
+
+### SCENARIO FUNCTIONS########################################
 def save_scenarios(scenarios=[]):
-    insert(scenario_insert, ut.scenarios_to_matrix(scenarios))
+    insert_many(scenario_insert, ut.scenarios_to_matrix(scenarios))
 
 def query_scenarios(query, parameters=[]):
     scenarios = []
@@ -126,9 +162,12 @@ def query_scenario(query, parameters=[]):
     group = query_group(research_group_select_by_id, s[4])
     return scenario(owner, group, s[1], s[2], s[0])
 
-### ARTEFACT METHODS########################################
+def clear_scenarios():
+    update(scenario_clear)
+
+### ARTEFACT FUNCTIONS########################################
 def save_artefacts(artefacts=[]):
-    insert(artefact_insert, ut.artefacts_to_matrix(artefacts))
+    insert_many(artefact_insert, ut.artefacts_to_matrix(artefacts))
 
 def query_artefacts(query, parameters=[]):
     artefacts = []
@@ -140,3 +179,6 @@ def query_artefacts(query, parameters=[]):
 def query_artefact(query, parameters=[]):
     t = fetch_one(query, parameters)
     return artefact(t[1], t[2], t[0])
+
+def clear_artefacts():
+    update(artefact_clear)

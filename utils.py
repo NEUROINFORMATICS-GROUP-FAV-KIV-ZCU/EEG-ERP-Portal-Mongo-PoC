@@ -22,6 +22,16 @@ def groups_to_matrix(groups):
 def res_group_to_tuple(rg):
     return str(rg.title), str(rg.desc), int(rg.owner.id)
 
+def prepare_member_matrix(group, persons=[]):
+    ret = []
+    for p in persons:
+        ret.append(prepare_member_tuple(group, p))
+
+    return ret
+
+def prepare_member_tuple(group, p):
+    return str(p.id), str(group.id), "GROUP_ADMIN"
+
 def scenarios_to_matrix(scenarios=[]):
     ret = []
     for s in scenarios:
