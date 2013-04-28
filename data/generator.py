@@ -1,11 +1,41 @@
 __author__ = 'veveri'
 
 from data.classes import *
+import oracle as oc
 
+### GLOBALS###########################################
+firstnameConst = "firstname"
+lastnameConst = "lastname"
+
+### DATABASE INIT#####################################
+def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count):
+    oc.clear_db()
+
+    #generate artefacts
+    arts = generate_artefacts(artefact_count)
+    oc.save_artefacts(arts)
+
+    #generate persons
+    pers = generate_persons(firstname_count, lastname_count)
+    oc.save_persons(pers)
+
+    #generate groups, owners differ by lastname
+    pers = oc.query_persons(oc.person_select_by_firstname, [firstnameConst + '0'])
+    groups = generate_research_groups(group_count, pers)
+    oc.save_research_groups(groups)
+    groups = oc.query_groups(oc.research_group_select_all)
+
+    #add members to groups
+    for g in groups:
+        pers = oc.query_persons(oc.person_select_by_lastname, [g.owner.lastname])
+        oc.add_res_group_members(g, pers)
+
+    #add scenarios to groups
+    scenarios = generate_scenarios(scenario_count_per_group, groups)
+    oc.save_scenarios(scenarios)
+
+### DATA GENERATORS###################################
 def generate_persons(firstname_count, lastname_count):
-    firstnameConst = "firstname"
-    lastnameConst = "lastname"
-
     persons = []
 
     for i in range(0, lastname_count):

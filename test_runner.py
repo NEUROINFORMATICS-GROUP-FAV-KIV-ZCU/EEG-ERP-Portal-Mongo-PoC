@@ -10,9 +10,12 @@ import oracle as oc
 
 #oc.save_research_groups(gen.generate_research_groups(5, owners))
 
-groups = oc.query_groups(oc.research_group_select_all)
-scenarios = gen.generate_scenarios(10, groups)
-oc.save_scenarios(scenarios)
+#groups = oc.query_groups(oc.research_group_select_all)
+#scenarios = gen.generate_scenarios(10, groups)
+#oc.save_scenarios(scenarios)
+#oc.clear_db()
+
+gen.init_oracle(100, 100, 100, 10, 100)
 
 
 
