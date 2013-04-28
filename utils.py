@@ -31,3 +31,13 @@ def scenarios_to_matrix(scenarios=[]):
 
 def scenario_to_tuple(s):
     return str(s.title), str(s.description), str(s.owner.id), str(s.group.id)
+
+def artefacts_to_matrix(artefacts=[]):
+    ret = []
+    for a in artefacts:
+        ret.append(artefact_to_tuple(a))
+
+    return ret
+
+def artefact_to_tuple(a):
+    return str(a.compensation), str(a.reject_condition)

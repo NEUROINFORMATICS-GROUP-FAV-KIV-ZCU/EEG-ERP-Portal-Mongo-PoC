@@ -1,7 +1,6 @@
 __author__ = 'veveri'
 
 from data.classes import *
-from pprint import pprint
 
 def generate_persons(firstname_count, lastname_count):
     firstnameConst = "firstname"
@@ -49,3 +48,14 @@ def generate_scenarios(title_count_per_group, groups):
             i += 1
 
     return scenarios
+
+def generate_artefacts(compensation_count, reject_param=5):
+    compensation_const = "compensation"
+    reject_const = "reject"
+    artefacts = []
+    for i in range(0, compensation_count):
+        compensation = compensation_const + str(i)
+        reject = reject_const + str(i % reject_param)
+        artefacts.append(artefact(compensation, reject))
+
+    return artefacts

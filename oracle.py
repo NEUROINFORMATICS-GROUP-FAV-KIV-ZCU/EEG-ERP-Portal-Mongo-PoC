@@ -3,7 +3,6 @@ __author__ = 'Jakub Danek'
 import cx_Oracle
 import utils as ut
 from data.classes import *
-import data.generator as gen
 
 ### PERSON QUERIES##########################################
 person_attributes = "GIVENNAME, SURNAME, GENDER, LATERALITY, EDUCATION_LEVEL_ID"
@@ -24,6 +23,12 @@ scenario_attributes = "TITLE, DESCRIPTION, OWNER_ID, RESEARCH_GROUP_ID"
 scenario_attributes_with_id = "SCENARIO_ID, " + scenario_attributes
 scenario_insert = "INSERT INTO SCENARIO(" + scenario_attributes + ") values (:1, :2, :3, :4)"
 scenario_select_all = "SELECT " + scenario_attributes_with_id + " FROM SCENARIO"
+
+### ARTEFACT QUERIES#######################################
+artefact_attributes = "COMPENSATION, REJECT_CONDITION"
+artefact_attributes_with_id = "ARTEFACT_ID, " + artefact_attributes
+artefact_insert = "INSERT INTO ARTEFACT(" + artefact_attributes + ") VALUES (:1, :2)"
+artefact_select_all = "SELECT " + artefact_attributes_with_id + " FROM ARTEFACT"
 
 ### GENERIC METHODS#########################################
 def connect():
@@ -120,3 +125,18 @@ def query_scenario(query, parameters=[]):
     owner = query_person(person_select_by_id, s[3])
     group = query_group(research_group_select_by_id, s[4])
     return scenario(owner, group, s[1], s[2], s[0])
+
+### ARTEFACT METHODS########################################
+def save_artefacts(artefacts=[]):
+    insert(artefact_insert, ut.artefacts_to_matrix(artefacts))
+
+def query_artefacts(query, parameters=[]):
+    artefacts = []
+    for t in fetch_many(query, parameters):
+        artefacts.append(artefact(t[1], t[2], t[0]))
+
+    return artefacts
+
+def query_artefact(query, parameters=[]):
+    t = fetch_one(query, parameters)
+    return artefact(t[1], t[2], t[0])

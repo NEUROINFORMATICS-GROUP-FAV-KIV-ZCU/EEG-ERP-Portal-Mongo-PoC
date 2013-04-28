@@ -54,10 +54,10 @@ class scenario:
         return "Scenario: " + self.title + ", desc: " + self.description + ", owner: " + self.owner
 
 class artefact:
-    def __init__(self):
-        self.id = 0
-        self.compensation = ""
-        self.reject_condition = ""
+    def __init__(self, compensation="", reject_condition="", id=0):
+        self.id = id
+        self.compensation = compensation
+        self.reject_condition = reject_condition
 
     def __str__(self):
-        return "Artefact: " + str(self.id) + ", compensation: " + self.compensation + ", reject condition: " + self.reject_condition
+        return "Artefact: " + self.compensation + ", reject condition: " + self.reject_condition
