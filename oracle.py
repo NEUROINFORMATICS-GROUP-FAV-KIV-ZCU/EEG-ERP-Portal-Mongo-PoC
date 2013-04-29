@@ -61,6 +61,13 @@ digitization_insert = "INSERT INTO DIGITIZATION(" + digitization_attributes + ")
 digitization_select_all = "SELECT " + digitization_attributes_with_id + " FROM DIGITIZATION"
 digitization_clear = "DELETE FROM DIGITIZATION"
 
+### SUBJECT_GROUP QUERIES########################################
+electrode_system_attributes = "TITLE, DESCRIPTION"
+electrode_system_attributes_with_id = "electrode_system_ID, " + electrode_system_attributes
+electrode_system_insert = "INSERT INTO electrode_system(" + electrode_system_attributes + ") values (:1, :2)"
+electrode_system_select_all = "SELECT " + electrode_system_attributes_with_id + " FROM electrode_system"
+electrode_system_clear = "DELETE FROM electrode_system"
+
 
 ### COMPOSITE FUNCTIONS#######################################
 def clear_db():
@@ -71,6 +78,7 @@ def clear_db():
     clear_weathers()
     clear_subject_groups()
     clear_digitizations()
+    clear_electrode_systems()
 
 ### GENERIC FUNCTIONS#########################################
 def connect():
@@ -263,3 +271,21 @@ def query_digitization(query, paramters=[]):
 
 def clear_digitizations():
     update(digitization_clear)
+
+### ELECTRODE SYSTEM FUNCTIONS####################################
+def save_electrode_system(electrode_system=[]):
+    insert_many(electrode_system_insert, ut.electrode_system_to_matrix(electrode_system))
+
+def query_electrode_systems(query, parameters=[]):
+    electrode_systems = []
+    for t in fetch_many(query, parameters):
+        electrode_systems.append(electrode_system(t[1], t[2], t[0]))
+
+    return electrode_systems
+
+def query_electrode_system(query, parameters=[]):
+    t = fetch_one(query, parameters)
+    return electrode_system(t[1], t[2], t[0])
+
+def clear_electrode_systems():
+    update(electrode_system_clear)

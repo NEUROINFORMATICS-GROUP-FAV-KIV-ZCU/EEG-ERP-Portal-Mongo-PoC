@@ -89,3 +89,12 @@ class digitization:
 
     def __str__(self):
         return "Digitization: " + self.filter + ", values: " + self.gain + ", " + self.sampling_rate
+
+class electrode_system:
+    def __init__(self, title="", desc="", id=0):
+        self.id = id
+        self.title = title
+        self.desc = desc
+
+    def __str__(self):
+        return "Electrode system: " + self.title + ", desc: " + self.desc

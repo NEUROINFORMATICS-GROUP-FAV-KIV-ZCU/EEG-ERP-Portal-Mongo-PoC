@@ -81,3 +81,13 @@ def digitization_to_matrix(digits=[]):
 
 def digitization_to_tuple(d):
     return str(d.gain), str(d.filter), str(d.sampling_rate)
+
+def electrode_system_to_matrix(s_group=[]):
+    ret = []
+    for w in s_group:
+        ret.append(electrode_system_to_tuple(w))
+
+    return ret
+
+def electrode_system_to_tuple(w):
+    return str(w.title), str(w.desc)

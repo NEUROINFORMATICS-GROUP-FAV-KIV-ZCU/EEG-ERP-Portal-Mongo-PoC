@@ -8,8 +8,12 @@ firstnameConst = "firstname"     #person firstname
 lastnameConst = "lastname"       #person lastname
 
 ### DATABASE INIT#####################################
-def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count, weather_count, subj_group_count, digit_count):
+def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count, weather_count, subj_group_count, digit_count, electrode_count):
     oc.clear_db()
+
+    #generate electrode_systems
+    elect = generate_electrode_systems(electrode_count)
+    oc.save_electrode_system(elect)
 
     #generate artefacts
     arts = generate_artefacts(artefact_count)
@@ -139,3 +143,13 @@ def generate_digitizations(digi_count = 0):
 
     return digits
 
+def generate_electrode_systems(title_count):
+    title_const = "electrode_system"
+    desc_const = "electrode_system description"
+    electrode_systems = []
+    for i in range(0, title_count):
+        title = title_const + str(i)
+        desc = desc_const + str(i)
+        electrode_systems.append(electrode_system(title, desc))
+
+    return electrode_systems
