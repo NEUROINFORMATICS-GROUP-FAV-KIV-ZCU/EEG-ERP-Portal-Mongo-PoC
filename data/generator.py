@@ -1,19 +1,31 @@
-__author__ = 'veveri'
+__author__ = 'Jakub Danek'
 
 from data.classes import *
 import oracle as oc
 
 ### GLOBALS###########################################
-firstnameConst = "firstname"
-lastnameConst = "lastname"
+firstnameConst = "firstname"     #person firstname
+lastnameConst = "lastname"       #person lastname
 
 ### DATABASE INIT#####################################
-def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count):
+def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count, weather_count, subj_group_count, digit_count):
     oc.clear_db()
 
     #generate artefacts
     arts = generate_artefacts(artefact_count)
     oc.save_artefacts(arts)
+
+    #generate digitizations
+    digits = generate_digitizations(digit_count)
+    oc.save_digitalization(digits)
+
+    #generate weather info
+    weathers = generate_weathers(weather_count)
+    oc.save_weather(weathers)
+
+    #generate subj. groups
+    subj_groups = generate_subject_groups(subj_group_count)
+    oc.save_subject_group(subj_groups)
 
     #generate persons
     pers = generate_persons(firstname_count, lastname_count)
@@ -89,3 +101,41 @@ def generate_artefacts(compensation_count, reject_param=5):
         artefacts.append(artefact(compensation, reject))
 
     return artefacts
+
+def generate_weathers(title_count):
+    title_const = "weather"
+    desc_const = "weather description"
+    weathers = []
+    for i in range(0, title_count):
+        title = title_const + str(i)
+        desc = desc_const + str(i)
+        weathers.append(weather(title, desc))
+
+    return weathers
+
+def generate_subject_groups(title_count):
+    title_const = "subject_group"
+    desc_const = "subject_group description"
+    subject_groups = []
+    for i in range(0, title_count):
+        title = title_const + str(i)
+        desc = desc_const + str(i)
+        subject_groups.append(subject_group(title, desc))
+
+    return subject_groups
+
+def generate_digitizations(digi_count = 0):
+    gain = 0
+    sample = 10000
+    filter_const = "filter"
+
+    digits = []
+    for i in range(0, digi_count):
+        gain += 0.1
+        sample += 1000
+        filter = filter_const + str(i)
+
+        digits.append(digitization(gain, filter, sample))
+
+    return digits
+

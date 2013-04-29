@@ -13,8 +13,7 @@
 1 000 scenarios
 --each owner (same as group owner) has 10
 
-1000 weather
---10 per group
+100 weather
 
 1000 artefact
 --compensation 1 - 1000

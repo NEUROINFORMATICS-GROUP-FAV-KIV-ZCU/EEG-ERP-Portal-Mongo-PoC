@@ -51,3 +51,33 @@ def artefacts_to_matrix(artefacts=[]):
 
 def artefact_to_tuple(a):
     return str(a.compensation), str(a.reject_condition)
+
+def weather_to_matrix(weather=[]):
+    ret = []
+    for w in weather:
+        ret.append(weather_to_tuple(w))
+
+    return ret
+
+def weather_to_tuple(w):
+    return str(w.title), str(w.desc)
+
+def subject_group_to_matrix(s_group=[]):
+    ret = []
+    for w in s_group:
+        ret.append(subject_group_to_tuple(w))
+
+    return ret
+
+def subject_group_to_tuple(w):
+    return str(w.title), str(w.desc)
+
+def digitization_to_matrix(digits=[]):
+    ret = []
+    for d in digits:
+        ret.append(digitization_to_tuple(d))
+
+    return ret
+
+def digitization_to_tuple(d):
+    return str(d.gain), str(d.filter), str(d.sampling_rate)

@@ -24,6 +24,7 @@ research_group_clear = "DELETE FROM RESEARCH_GROUP"
 
 research_group_member_attributes = "PERSON_ID, RESEARCH_GROUP_ID, AUTHORITY"
 research_group_member_insert = "INSERT INTO RESEARCH_GROUP_MEMBERSHIP (" + research_group_member_attributes + ") VALUES (:1, :2, :3)"
+research_group_member_clear = "DELETE FROM RESEARCH_GROUP_MEMBERSHIP"
 
 ### SCENARIO QUERIES#######################################
 scenario_attributes = "TITLE, DESCRIPTION, OWNER_ID, RESEARCH_GROUP_ID"
@@ -39,12 +40,37 @@ artefact_insert = "INSERT INTO ARTEFACT(" + artefact_attributes + ") VALUES (:1,
 artefact_select_all = "SELECT " + artefact_attributes_with_id + " FROM ARTEFACT"
 artefact_clear = "DELETE FROM ARTEFACT"
 
+### WEATHER QUERIES########################################
+weather_attributes = "TITLE, DESCRIPTION"
+weather_attributes_with_id = "WEATHER_ID, " + weather_attributes
+weather_insert = "INSERT INTO WEATHER(" + weather_attributes + ") values (:1, :2)"
+weather_select_all = "SELECT " + weather_attributes_with_id + " FROM WEATHER"
+weather_clear = "DELETE FROM WEATHER"
+
+### SUBJECT_GROUP QUERIES########################################
+subject_group_attributes = "TITLE, DESCRIPTION"
+subject_group_attributes_with_id = "SUBJECT_GROUP_ID, " + subject_group_attributes
+subject_group_insert = "INSERT INTO SUBJECT_GROUP(" + subject_group_attributes + ") values (:1, :2)"
+subject_group_select_all = "SELECT " + subject_group_attributes_with_id + " FROM SUBJECT_GROUP"
+subject_group_clear = "DELETE FROM SUBJECT_GROUP"
+
+### DIGITALISATION QUERIES####################################
+digitization_attributes = "GAIN, FILTER, SAMPLING_RATE"
+digitization_attributes_with_id = "DIGITIZATION_ID, " + digitization_attributes
+digitization_insert = "INSERT INTO DIGITIZATION(" + digitization_attributes + ") VALUES(:1, :2, :3)"
+digitization_select_all = "SELECT " + digitization_attributes_with_id + " FROM DIGITIZATION"
+digitization_clear = "DELETE FROM DIGITIZATION"
+
+
 ### COMPOSITE FUNCTIONS#######################################
 def clear_db():
     clear_scenarios()
     clear_groups()
     clear_persons()
     clear_artefacts()
+    clear_weathers()
+    clear_subject_groups()
+    clear_digitizations()
 
 ### GENERIC FUNCTIONS#########################################
 def connect():
@@ -141,6 +167,7 @@ def query_group(query, parameters=[]):
     return research_group(owner, t[1], t[2], t[0])
 
 def clear_groups():
+    update(research_group_member_clear)
     update(research_group_clear)
 
 ### SCENARIO FUNCTIONS########################################
@@ -182,3 +209,57 @@ def query_artefact(query, parameters=[]):
 
 def clear_artefacts():
     update(artefact_clear)
+
+### WEATHER FUNCTIONS#########################################
+def save_weather(weather=[]):
+    insert_many(weather_insert, ut.weather_to_matrix(weather))
+
+def query_weathers(query, parameters=[]):
+    weathers = []
+    for t in fetch_many(query, parameters):
+        weathers.append(weather(t[1], t[2], t[0]))
+
+    return weathers
+
+def query_weather(query, parameters=[]):
+    t = fetch_one(query, parameters)
+    return weather(t[1], t[2], t[0])
+
+def clear_weathers():
+    update(weather_clear)
+
+### SUBJECT GROUP FUNCTIONS####################################
+def save_subject_group(subject_group=[]):
+    insert_many(subject_group_insert, ut.subject_group_to_matrix(subject_group))
+
+def query_subject_groups(query, parameters=[]):
+    subject_groups = []
+    for t in fetch_many(query, parameters):
+        subject_groups.append(subject_group(t[1], t[2], t[0]))
+
+    return subject_groups
+
+def query_subject_group(query, parameters=[]):
+    t = fetch_one(query, parameters)
+    return subject_group(t[1], t[2], t[0])
+
+def clear_subject_groups():
+    update(subject_group_clear)
+
+### DIGITALISATION FUNCTIONS##################################
+def save_digitalization(digit = []):
+    insert_many(digitization_insert, ut.digitization_to_matrix(digit))
+
+def query_digitizations(query, parameters=[]):
+    digits = []
+    for t in fetch_many(query, parameters):
+        digits.append(digitization(t[1], t[2], t[3], t[0]))
+
+    return digits
+
+def query_digitization(query, paramters=[]):
+    t = fetch_one(query, paramters)
+    return digitization(t[1], t[2], t[3], t[0])
+
+def clear_digitizations():
+    update(digitization_clear)

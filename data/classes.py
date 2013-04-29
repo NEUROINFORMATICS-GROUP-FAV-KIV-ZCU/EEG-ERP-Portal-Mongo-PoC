@@ -61,3 +61,31 @@ class artefact:
 
     def __str__(self):
         return "Artefact: " + self.compensation + ", reject condition: " + self.reject_condition
+
+class weather:
+    def __init__(self, title="", desc="", id=0):
+        self.id = id
+        self.title = title
+        self.desc = desc
+
+    def __str__(self):
+        return "Weather: " + self.title + ", desc: " + self.desc
+
+class subject_group:
+    def __init__(self, title="", desc="", id=0):
+        self.id = id
+        self.title = title
+        self.desc = desc
+
+    def __str__(self):
+        return "Subject group: " + self.title + ", desc: " + self.desc
+
+class digitization:
+    def __init__(self, gain=0.0, filter="", sampling=0.0, id=0):
+        self.id = id
+        self.gain = gain
+        self.filter=filter
+        self.sampling_rate=sampling
+
+    def __str__(self):
+        return "Digitization: " + self.filter + ", values: " + self.gain + ", " + self.sampling_rate
