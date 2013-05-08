@@ -12,8 +12,11 @@ json_data.close()
 client = MongoClient()
 db = client.db_experiment
 collection = db.experiments
-id = collection.insert(data)
+collection.drop()
 
-for experiment in collection.find({"configuration.temperature" : 101}):
-    pprint(experiment)
 
+def insert_many(data=None):
+    if(data == None):
+        return None
+
+    return collection.insert(data)
