@@ -20,6 +20,82 @@ class experiment:
         self.subject_group = s_group
         self.weather = weather
 
+    def to_dict(self):
+        return {
+            "experiment_id": self.id,
+            "header": self.make_header(),
+            "scenario": self.make_scenario(),
+            "subject": self.make_subject(),
+            "configuration": self.make_configuration()
+        }
+
+    def make_configuration(self):
+        return {
+            "temperature": self.temperature,
+            "weather": self.make_weather(),
+            "environment_note": self.environment_note,
+            "artefact": self.make_artefact(),
+            "electrode_system": self.electrode.title,
+            "digitization": self.make_digitization()
+        }
+
+    def make_digitization(self):
+        return {
+            "sampling_rate": self.digitization.sampling_rate,
+            "gain": self.digitization.gain
+        }
+
+    def make_artefact(self):
+        return {
+            "compensation": self.artefact.compensation,
+            "reject_condition": self.artefact.reject_condition
+        }
+
+    def make_weather(self):
+        return {
+            "title": self.weather.title,
+            "description": self.weather.desc
+        }
+
+    def make_subject(self):
+        subj = self.make_person(self.subject)
+        subj["gender"] = self.subject.gender
+        #subj["date_of_birth"] = self.subject.date_of_birth
+        subj["laterality"] = self.subject.laterality
+        subj["group"] = {}
+        subj["group"]["title"] = self.subject_group.title
+        subj["group"]["description"] = self.subject_group.desc
+        return subj
+
+
+    def make_scenario(self):
+        return {
+            "name": self.scenario.title,
+            "description": self.scenario.description,
+            "owner": self.make_person(self.scenario.owner)
+        }
+
+    def make_header(self):
+        return {
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "owner": self.make_person(self.owner),
+            "research_group": self.make_r_group()
+        }
+
+    def make_r_group(self):
+        return {
+            "title": self.research_group.title,
+            "owner": self.make_person(self.research_group.owner)
+        }
+
+    def make_person(self, person):
+        return {
+            "firstname": person.firstname,
+            "lastname": person.lastname
+        }
+
+
 
 class person:
 

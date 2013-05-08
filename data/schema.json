@@ -27,7 +27,8 @@
     },
 
     "subject" : {
-        "name" : "subject name",
+        "firstname" : "subject name",
+        "lastname" : "lastname",
         "gender" : "gender",
         "date of birth" : "ddmmyyy",
         "laterality" : "bigfootness!",
@@ -41,15 +42,15 @@
         "temperature" : 100,
         "weather" : {
             "title" : "pocasi",
-            "note" : "opravdu hnusne prselo"
+            "description" : "opravdu hnusne prselo"
         },
-        "environment note" : "ale priroda opravdu nadherna, proste nadherna",
+        "environment_note" : "ale priroda opravdu nadherna, proste nadherna",
         "artefact" : {
             "compensation" : "gimme all your money!",
-            "reject condition" : "weve got more guns"
+            "reject_condition" : "weve got more guns"
         },
-        "electrode system" : "system title",
-        "digitalisation" : {
+        "electrode_system" : "system title",
+        "digitization" : {
             "sampling_rate" : "666",
             "gain" : "1.2"
         },
