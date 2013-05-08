@@ -72,7 +72,7 @@ def generate_experiments(exp_per_member = 10):
     subj_index = 22
     print "Subjects loaded"
     #scenarios = oc.query_scenarios(oc.scenario_select_all)
-    scenarios = oc.query_scenarios_full()
+    scenarios = oc.query_scenarios_full(oc.scenario_select_all_full)
     scenario_len = len(scenarios)
     scenario_index = 34
     print "Scenarios loaded"

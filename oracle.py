@@ -33,6 +33,7 @@ scenario_attributes_with_id = "SCENARIO_ID, " + scenario_attributes
 scenario_insert = "INSERT INTO SCENARIO(" + scenario_attributes + ") values (:1, :2, :3, :4)"
 scenario_select_all = "SELECT " + scenario_attributes_with_id + " FROM SCENARIO"
 scenario_select_all_full = "SELECT s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p WHERE s.OWNER_ID = p.PERSON_ID"
+scenario_select_full_by_id = scenario_select_all_full + " AND SCENARIO_ID = :1"
 scenario_select_by_id = scenario_select_all + " WHERE SCENARIO_ID = :1"
 scenario_clear = "DELETE FROM SCENARIO"
 
@@ -76,7 +77,7 @@ electrode_system_select_all = "SELECT " + electrode_system_attributes_with_id + 
 electrode_system_clear = "DELETE FROM electrode_system"
 electrode_conf_insert = "INSERT INTO ELECTRODE_CONF (IMPEDANCE, ELECTRODE_SYSTEM_ID) VALUES(0, :1)"
 electrode_conf_select_all = "SELECT c.ELECTRODE_CONF_ID, s.ELECTRODE_SYSTEM_ID, s.TITLE, s.DESCRIPTION FROM ELECTRODE_CONF c, ELECTRODE_SYSTEM s WHERE c.ELECTRODE_SYSTEM_ID = s.ELECTRODE_SYSTEM_ID"
-electrode_conf_select_by_id = electrode_conf_select_all + " WHERE c.ELECTRODE_CONF_ID = :1"
+electrode_conf_select_by_id = electrode_conf_select_all + " AND c.ELECTRODE_CONF_ID = :1"
 electrode_system_clear = "DELETE FROM electrode_conf"
 
 ### EXPERIMENT QUERIES##########################################
@@ -85,6 +86,31 @@ experiment_attributes_with_id = "EXPERIMENT_ID, " +  experiment_attributes
 experiment_insert = "INSERT INTO EXPERIMENT(" + experiment_attributes + ") VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)"
 experiment_select_all = "SELECT " + experiment_attributes_with_id + " FROM EXPERIMENT"
 experiment_clear = "DELETE FROM EXPERIMENT"
+experiment_select_full_all = "SELECT e.EXPERIMENT_ID, e.SCENARIO_ID," \
+                             " s.GIVENNAME, s.SURNAME, s.GENDER, s.LATERALITY," \
+                             " w.TITLE, w.DESCRIPTION," \
+                             " o.GIVENNAME, o.SURNAME, o.GENDER, o.LATERALITY," \
+                             " e.RESEARCH_GROUP_ID," \
+                             " a.COMPENSATION, a.REJECT_CONDITION," \
+                             " sg.TITLE, sg.DESCRIPTION," \
+                             " e.ELECTRODE_CONF_ID," \
+                             " d.GAIN, d.FILTER, d.SAMPLING_RATE," \
+                             " sc.TITLE, sc.DESCRIPTION, scp.GIVENNAME, scp.SURNAME," \
+                             " rg.TITLE, rg.DESCRIPTION," \
+                             " es.TITLE, es.DESCRIPTION" \
+                             " FROM EXPERIMENT e, PERSON s, WEATHER w, PERSON o, ARTEFACT a, SUBJECT_GROUP sg, DIGITIZATION d, SCENARIO sc, PERSON scp," \
+                             "      RESEARCH_GROUP rg, ELECTRODE_CONF ec, ELECTRODE_SYSTEM es" \
+                             " WHERE e.SUBJECT_PERSON_ID = s.PERSON_ID" \
+                             " AND e.WEATHER_ID = w.WEATHER_ID" \
+                             " AND e.OWNER_ID = o.PERSON_ID" \
+                             " AND e.ARTEFACT_ID = a.ARTEFACT_ID" \
+                             " AND e.SUBJECT_GROUP_ID = sg.SUBJECT_GROUP_ID" \
+                             " AND e.DIGITIZATION_ID = d.DIGITIZATION_ID" \
+                             " AND e.SCENARIO_ID = sc.SCENARIO_ID" \
+                             " AND sc.OWNER_ID = scp.PERSON_ID" \
+                             " AND e.RESEARCH_GROUP_ID = rg.RESEARCH_GROUP_ID" \
+                             " AND e.ELECTRODE_CONF_ID = ec.ELECTRODE_CONF_ID" \
+                             " AND ec.ELECTRODE_SYSTEM_ID = es.ELECTRODE_SYSTEM_ID"
 
 
 ### COMPOSITE FUNCTIONS#######################################
@@ -161,19 +187,28 @@ def save_experiments(experiments=[]):
 #"EXPERIMENT_ID, SCENARIO_ID, SUBJECT_PERSON_ID, WEATHER_ID, OWNER_ID, RESEARCH_GROUP_ID, ARTEFACT_ID, SUBJECT_GROUP_ID, ELECTRODE_CONF_ID, DIGITIZATION_ID"
 def query_experiments(query, parameters=[]):
     ret = []
+    i = 0
     for t in fetch_many(query, parameters):
-        scenario = query_scenario(scenario_select_by_id, [t[1]])
-        subject = query_person(person_select_by_id, [t[2]])
-        weather = query_weather(weather_select_by_id, [t[3]])
-        owner = query_person(person_select_by_id, [t[4]])
-        r_group = query_group(research_group_select_by_id, [t[5]])
-        artefact = query_artefact(artefact_select_by_id, [t[6]])
-        s_group = query_subject_group(subject_group_select_by_id, [t[7]])
-        electrode = query_electrode_conf(electrode_conf_select_by_id, [t[8]])
-        digit = query_digitization(digitization_select_by_id, [t[9]])
 
-        exp = experiment(owner, r_group, scenario, artefact, subject, electrode, digit, s_group, weather)
+        subject = person(t[2], t[3], t[4], t[5])
+        w = weather(t[6], t[7])
+        owner = person(t[8], t[9], t[10], t[11])
+        a = artefact(t[13], t[14])
+        s_group = subject_group(t[15], t[16])
+        digit = digitization(t[18], t[19], t[20])
+        #scenario - research group is empty for now
+        s = scenario(person(t[23], t[24]), research_group(), t[21], t[22], t[1])
+        #research group - owner is empty for now
+        r_group = research_group(person(), t[25], t[26], t[12])
+
+        e = electrode_system(t[27], t[28])
+
+        exp = experiment(owner, r_group, s, a, subject, e, digit, s_group, w)
         ret.append(exp)
+        i += 1
+        if(i % 1000 == 0):
+            print(str(i) + " experiments loaded")
+
 
     return ret
 
@@ -236,20 +271,26 @@ def query_scenarios(query, parameters=[]):
 
     return scenarios
 
-#"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p WHERE s.OWNER_ID = p.PERSON_ID"
-def query_scenarios_full():
+#"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p"
+def query_scenarios_full(query, parameters=[]):
     scenarios = []
-    for s in fetch_many(scenario_select_all_full):
+    for s in fetch_many(query, parameters):
         owner = person(s[3], s[4],'M','X', s[5])
         scenarios.append(scenario(owner, research_group(), s[1], s[2], s[0]))
 
     return scenarios
 
+#"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p"
+def query_scenario_full(query, parameters=[]):
+    s = fetch_one(query, parameters)
+    owner = person(s[3], s[4],'M','X', s[5])
+    return scenario(owner, research_group(), s[1], s[2], s[0])
+
 
 def query_scenario(query, parameters=[]):
     s = fetch_one(query, parameters)
-    owner = query_person(person_select_by_id, s[3])
-    group = query_group(research_group_select_by_id, s[4])
+    owner = query_person(person_select_by_id, [s[3]])
+    group = query_group(research_group_select_by_id, [s[4]])
     return scenario(owner, group, s[1], s[2], s[0])
 
 def clear_scenarios():
