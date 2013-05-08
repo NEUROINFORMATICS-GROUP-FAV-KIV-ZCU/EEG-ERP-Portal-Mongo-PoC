@@ -89,5 +89,23 @@ def electrode_system_to_matrix(s_group=[]):
 
     return ret
 
+def electrode_system_ids_to_matrix(el_systems=[]):
+    ret = []
+    for w in el_systems:
+        ret.append([w.id])
+
+    return ret
+
 def electrode_system_to_tuple(w):
     return str(w.title), str(w.desc)
+
+def experiments_to_matrix(experiments=[]):
+    ret = []
+    for e in experiments:
+        ret.append(experiment_to_tuple(e))
+
+    return ret
+
+#SCENARIO_ID, SUBJECT_PERSON_ID, WEATHER_ID, OWNER_ID, RESEARCH_GROUP_ID, ARTEFACT_ID, SUBJECT_GROUP_ID, ELECTRODE_CONF_ID, DIGITIZATION_ID
+def experiment_to_tuple(e):
+    return str(e.scenario.id), str(e.subject.id), str(e.weather.id), str(e.owner.id), str(e.research_group.id), str(e.artefact.id), str(e.subject_group.id), str(e.electrode.conf_id), str(e.digitization.id)

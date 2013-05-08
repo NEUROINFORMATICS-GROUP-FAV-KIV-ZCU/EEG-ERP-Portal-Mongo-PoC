@@ -4,18 +4,21 @@ from datetime import datetime
 
 class experiment:
 
-    def __init__(self):
-        self.id = 0
+    def __init__(self, owner=None, r_group=None, scenario=None, artefact=None, subject=None, electrode=None, digit=None, s_group=None, weather=None, id = 0):
+        self.id = id
         self.start_time = datetime(2012, 12, 12, 13, 22)
         self.end_time = datetime(2012, 12, 12, 13, 42)
-        self.owner = person()
-        self.research_group = research_group()
-        self.scenario = scenario()
-        self.artefact = artefact()
-        self.subject = person()
+        self.owner = owner
+        self.research_group = r_group
+        self.scenario = scenario
+        self.artefact = artefact
+        self.subject = subject
         self.temperature = 0
         self.environment_note = ""
-        return
+        self.electrode = electrode
+        self.digitization = digit
+        self.subject_group = s_group
+        self.weather = weather
 
 
 class person:
@@ -32,7 +35,7 @@ class person:
 
 class research_group:
 
-    def __init__(self, owner, title="", desc="", id=0):
+    def __init__(self, owner= person(), title="", desc="", id=0):
         self.id = id
         self.owner = owner
         self.title = title
@@ -91,8 +94,9 @@ class digitization:
         return "Digitization: " + self.filter + ", values: " + self.gain + ", " + self.sampling_rate
 
 class electrode_system:
-    def __init__(self, title="", desc="", id=0):
+    def __init__(self, title="", desc="", id=0, conf_id=0):
         self.id = id
+        self.conf_id=conf_id
         self.title = title
         self.desc = desc
 

@@ -35,3 +35,7 @@
 100 pharma
 
 
+#experiments:
+-- load all non-group items (weather, subj_group, artefacts, electrodes....) into dicts
+-- load all groups, per group load all members, add 10 exp. per member
+-- iterate over the dictionaries to provide custom attributes

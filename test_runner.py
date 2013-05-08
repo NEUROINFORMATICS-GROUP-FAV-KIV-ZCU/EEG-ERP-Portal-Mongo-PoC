@@ -15,7 +15,10 @@ import oracle as oc
 #oc.save_scenarios(scenarios)
 #oc.clear_db()
 
-gen.init_oracle(100, 100, 100, 10, 100, 100, 200, 100, 100)
+print "### STARTING TEST RUN ###"
+#gen.init_oracle(100, 100, 100, 10, 100, 100, 200, 100, 100)
+gen.generate_experiments()
+print "### TEST RUN FINISHED ###"
 
 
 
