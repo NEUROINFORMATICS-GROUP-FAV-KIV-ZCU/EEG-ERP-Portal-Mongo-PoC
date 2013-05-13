@@ -53,24 +53,7 @@
         "digitization" : {
             "sampling_rate" : "666",
             "gain" : "1.2"
-        },
-        "software" : [
-            {"title" : "T602"},
-            {"title" : "Batlik"},
-            {"title" : "Prehistorc"}
-        ],
-        "hardware" : [
-            {"title" : "Soundblaster PRO", "type" : "audio"},
-            {"title" : "VooDoo", "type" : "video"}
-        ],
-        "project_type" : [
-            {"title" : "Lets blow up the whole world - kind of - project"},
-            {"title" : "School Paper"}
-        ],
-        "pharmaceutical" : [
-            {"title" : "Blind"},
-            {"title" : "Deaf"}
-        ]
+        }
     }
 
 

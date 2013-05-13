@@ -60,7 +60,7 @@ class experiment:
     def make_subject(self):
         subj = self.make_person(self.subject)
         subj["gender"] = self.subject.gender
-        #subj["date_of_birth"] = self.subject.date_of_birth
+        subj["date_of_birth"] = self.subject.dob
         subj["laterality"] = self.subject.laterality
         subj["group"] = {}
         subj["group"]["title"] = self.subject_group.title
@@ -99,13 +99,14 @@ class experiment:
 
 class person:
 
-    def __init__(self, firstname="", lastname="", gender="M", laterality='X', id=0):
+    def __init__(self, firstname="", lastname="", gender="M", laterality='X', dob=datetime(1900,1,1), id=0):
         self.id = id
         self.firstname = firstname
         self.lastname = lastname
         self.gender = gender
         self.laterality = laterality
         self.education_level_id = 1
+        self.dob = dob
 
 
 

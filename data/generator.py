@@ -9,6 +9,7 @@ lastnameConst = "lastname"       #person lastname
 
 ### DATABASE INIT#####################################
 def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count, weather_count, subj_group_count, digit_count, electrode_count):
+    print "Cleaning DB"
     oc.clear_db()
     print "DB is empty now"
 
@@ -128,7 +129,8 @@ def generate_persons(firstname_count, lastname_count):
         lastname = lastnameConst + str(i)
         for j in range(0, firstname_count):
             firstname = firstnameConst + str(j)
-            persons.append(person(firstname, lastname))
+            date = datetime(1900 + j, 1, 1)
+            persons.append(person(firstname, lastname, dob=date))
 
     return persons
 
