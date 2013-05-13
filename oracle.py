@@ -5,9 +5,9 @@ import utils as ut
 from data.classes import *
 
 ### PERSON QUERIES##########################################
-person_attributes = "p.GIVENNAME, p.SURNAME, p.GENDER, p.LATERALITY, p.EDUCATION_LEVEL_ID"
+person_attributes = "p.GIVENNAME, p.SURNAME, p.GENDER, p.LATERALITY, p.EDUCATION_LEVEL_ID, p.DATE_OF_BIRTH"
 person_attributes_with_id = "p.PERSON_ID, " + person_attributes
-person_insert = 'INSERT INTO PERSON p(' + person_attributes + ') values(:1, :2, :3, :4, :5)'
+person_insert = 'INSERT INTO PERSON p(' + person_attributes + ') values(:1, :2, :3, :4, :5, :6)'
 person_select_all = "SELECT "  + person_attributes_with_id + " FROM PERSON p"
 person_select_by_id = person_select_all + " WHERE p.PERSON_ID = :1"
 person_select_by_lastname = person_select_all + " WHERE p.SURNAME = :1"
@@ -97,7 +97,8 @@ experiment_select_full_all = "SELECT e.EXPERIMENT_ID, e.SCENARIO_ID," \
                              " d.GAIN, d.FILTER, d.SAMPLING_RATE," \
                              " sc.TITLE, sc.DESCRIPTION, scp.GIVENNAME, scp.SURNAME," \
                              " rg.TITLE, rg.DESCRIPTION," \
-                             " es.TITLE, es.DESCRIPTION" \
+                             " es.TITLE, es.DESCRIPTION," \
+                             " o.DATE_OF_BIRTH, s.DATE_OF_BIRTH" \
                              " FROM EXPERIMENT e, PERSON s, WEATHER w, PERSON o, ARTEFACT a, SUBJECT_GROUP sg, DIGITIZATION d, SCENARIO sc, PERSON scp," \
                              "      RESEARCH_GROUP rg, ELECTRODE_CONF ec, ELECTRODE_SYSTEM es" \
                              " WHERE e.SUBJECT_PERSON_ID = s.PERSON_ID" \
@@ -127,7 +128,7 @@ def clear_db():
 
 ### GENERIC FUNCTIONS#########################################
 def connect():
-    con = cx_Oracle.connect('DB2/db@127.0.0.1/DB')
+    con = cx_Oracle.connect('DB2/db@127.0.0.1/DB', threaded=True)
     return con
 
 def insert_many(query, params=[]):
@@ -184,15 +185,21 @@ def fetch_one(query, params=[]):
 def save_experiments(experiments=[]):
     insert_many(experiment_insert, ut.experiments_to_matrix(experiments))
 
-#"EXPERIMENT_ID, SCENARIO_ID, SUBJECT_PERSON_ID, WEATHER_ID, OWNER_ID, RESEARCH_GROUP_ID, ARTEFACT_ID, SUBJECT_GROUP_ID, ELECTRODE_CONF_ID, DIGITIZATION_ID"
-def query_experiments(query, parameters=[]):
+"""
+EXPERIMENT_ID
+"""
+def query_experiment_ids(query, parameters=[]):
+    ret = []
+    return fetch_many(query, parameters)
+
+def query_experiments_full(query, parameters=[]):
     ret = []
     i = 0
     for t in fetch_many(query, parameters):
 
-        subject = person(t[2], t[3], t[4], t[5])
+        subject = person(t[2], t[3], t[4], t[5], t[30])
         w = weather(t[6], t[7])
-        owner = person(t[8], t[9], t[10], t[11])
+        owner = person(t[8], t[9], t[10], t[11], t[29])
         a = artefact(t[13], t[14])
         s_group = subject_group(t[15], t[16])
         digit = digitization(t[18], t[19], t[20])
@@ -203,7 +210,7 @@ def query_experiments(query, parameters=[]):
 
         e = electrode_system(t[27], t[28])
 
-        exp = experiment(owner, r_group, s, a, subject, e, digit, s_group, w)
+        exp = experiment(owner, r_group, s, a, subject, e, digit, s_group, w, t[0])
         ret.append(exp)
         i += 1
         if(i % 1000 == 0):
@@ -222,13 +229,13 @@ def save_persons(persons=[]):
 def query_persons(query, parameters=[]):
     persons = []
     for t in fetch_many(query, parameters):
-        persons.append(person(t[1], t[2], t[3], t[4], t[0]))
+        persons.append(person(t[1], t[2], t[3], t[4], t[5], t[0]))
 
     return persons
 
 def query_person(query, parameters=[]):
     t = fetch_one(query, parameters)
-    return  person(t[1], t[2], t[3], t[4], t[0])
+    return  person(t[1], t[2], t[3], t[4], t[5], t[0])
 
 def clear_persons():
     update(person_clear)

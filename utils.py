@@ -10,7 +10,7 @@ def persons_to_matrix(persons=[]):
     return ret
 
 def person_to_tuple(p):
-    return str(p.firstname), str(p.lastname), str(p.gender), str(p.laterality), str(p.education_level_id)
+    return str(p.firstname), str(p.lastname), str(p.gender), str(p.laterality), str(p.education_level_id), p.dob
 
 def groups_to_matrix(groups):
     ret = []
