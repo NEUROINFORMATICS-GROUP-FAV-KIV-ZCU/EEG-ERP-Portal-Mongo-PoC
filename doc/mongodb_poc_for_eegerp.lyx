@@ -1,0 +1,538 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass paper
+\use_default_options true
+\maintain_unincluded_children false
+\language czech
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language polish
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+MongoDB in EEG/ERP Portal
+\end_layout
+
+\begin_layout SubTitle
+Proof of Concept
+\end_layout
+
+\begin_layout Author
+Jakub Daněk (A12N0059P)
+\end_layout
+
+\begin_layout Institution
+danekja@students.zcu.cz
+\end_layout
+
+\begin_layout Date
+15.05.2013
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Date
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Project Background
+\end_layout
+
+\begin_layout Standard
+The EEG/ERP Portal (further referenced as the Portal) is a java-based web
+ application developed at the Department of Computer Science and Engineering
+ at the University of West Bohemia.
+ It's purpose is to store, manage, process and share neuroscience data.
+ These data are often stored with lots of meta-data (environment, device
+ settings, subject information).
+ Currently the Portal's data layer is built on Oracle RDBMS.
+ For the reasons mentioned further in this document, it's been decided to
+ explore whether and how NOSQL databases (MongoDB in particular) could be
+ used in the project.
+\end_layout
+
+\begin_layout Subsection*
+Project Goals
+\end_layout
+
+\begin_layout Standard
+In comparison to relational databases, the expected benefits from using
+ MongoDB are:
+\end_layout
+
+\begin_layout Itemize
+higher flexibility - ability to store various (even unexpected) meta-data
+ without the need of changes in the application's data model.
+\end_layout
+
+\begin_layout Itemize
+faster search by meta-data values - key:value search should provide performance
+ boost thanks to removing the need to join tables
+\end_layout
+
+\begin_layout Standard
+However, there are also several questions to discuss:
+\end_layout
+
+\begin_layout Itemize
+What changes to the application would have to be done to switch the database
+ engines?
+\end_layout
+
+\begin_layout Itemize
+What disadvantages would the switch bring?
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Subsection
+Database
+\end_layout
+
+\begin_layout Standard
+The following subset of experiment meta-data has been selected for the PoC:
+\end_layout
+
+\begin_layout Itemize
+start and end time
+\end_layout
+
+\begin_layout Itemize
+research group the experiment belongs to
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+its title and owner's name
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+name of the experiment owner (the responsible person)
+\end_layout
+
+\begin_layout Itemize
+experiment scenario
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+title, description, name of the scenario's owner
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+subject information
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+name, date of birth, laterality, gender, age
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+misc data
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+weather, environment notes, electrode settings, artifact information
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection*
+Oracle
+\end_layout
+
+\begin_layout Standard
+A copy of the Portal's database has been extended by additional triggers
+ for auto-incrementing primary keys of the tables relevant to the experiment.
+\end_layout
+
+\begin_layout Subsubsection*
+MongoDB
+\end_layout
+
+\begin_layout Standard
+Sample JSON document has been designed to represent the default data structure.
+ The document shall be attached to this paper.
+\end_layout
+
+\begin_layout Subsection
+Test Framework
+\end_layout
+
+\begin_layout Standard
+A framework has been developed for easier and repeatable testing.
+ It's written in Python which has been chosen for mature drivers for both
+ the database engines, good handling of data collections and fast development.
+ The framework provides following functionality:
+\end_layout
+
+\begin_layout Itemize
+parameter-based generating of test data into Oracle DB
+\end_layout
+
+\begin_layout Itemize
+export of all the experiments in OracleDB into MongoDB
+\end_layout
+
+\begin_layout Itemize
+running bulks of queries on both the databases
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+measures the execution time
+\end_layout
+
+\begin_layout Itemize
+parameter-based bulk size
+\end_layout
+
+\begin_layout Itemize
+possibility to run bulks in parallel to increase server load
+\end_layout
+
+\end_deeper
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Subsection
+Performance
+\end_layout
+
+\begin_layout Subsubsection*
+Machine Specifications
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+CPU: Intel i7 2.1 GHz, 4 cores
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+RAM: 8 GB
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+OS: Gentoo Linux, kernel: 3.7.10
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Oracle: 11g Release 2 (11.2)
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+MongoDB: 2.4.0
+\end_layout
+
+\begin_layout Subsubsection*
+Tests
+\end_layout
+
+\begin_layout Standard
+Three test cases (queries) were used:
+\end_layout
+
+\begin_layout Enumerate
+Search by scenario name (single join in Oracle)
+\end_layout
+
+\begin_layout Enumerate
+Search by name of a research group (two joins in Oracle)
+\end_layout
+
+\begin_layout Enumerate
+Search by age of a subject (aggregation function in Oracle, date comparison
+ in MongoDB)
+\end_layout
+
+\begin_layout Standard
+Test iteration consisted of 100 queries in a row, which were run in parallel
+ (in 1, 2, 4, 8, 16 and 32 threads).
+ As a result 100 (200, 400, ..., 3200) queries had been run.
+ For MongoDB six iterations were run without indexes, followed by six iterations
+ with indexes created.
+ For Oracle, all 12 iterations were run with indexes created for the relevant
+ columns.
+\end_layout
+
+\begin_layout Standard
+See attached tables for detailed results.
+\end_layout
+
+\begin_layout Standard
+Tests have provided following output:
+\end_layout
+
+\begin_layout Itemize
+MongoDB returns results on average 2-3 times faster than Oracle in most
+ cases.
+\end_layout
+
+\begin_layout Itemize
+Indexes in MongoDB didnt seem to have any significant effect on performance.
+\end_layout
+
+\begin_layout Itemize
+When running queries in parallel MongoDB performs much better for queries
+ 1.
+ and 2.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Oracle kept the same query/s ratio (which resulted in exponential growth
+ of test duration, depending on number of threads)
+\end_layout
+
+\begin_layout Itemize
+query/s ratio of MongoDB was increasing significantly up to 8 threads (and
+ it kept the ratio for 16 and 32 threads)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+MongoDB had problems with query 3.
+ under heavy load (16 and 32 threads)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+this was the only case where Oracle performed better
+\end_layout
+
+\begin_layout Itemize
+one of the reasons might be that while Oracle can get the age value from
+ a date, MongoDB has to compare dates directly
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Stability
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+MongoDB gave stable results for all iterations
+\end_layout
+
+\begin_layout Itemize
+Oracle experienced significant performance jumps during iterations, for
+ unknown reason (as a result the average query/s ratio contains rather high
+ statistical error)
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Flexibility
+\end_layout
+
+\begin_layout Standard
+Due to its query system and document nature, MongoDB is suitable for searching
+ experiment meta-data.
+ However, it doesn't provide an ultimate solution for the Portal as there
+ are pieces of information for which relational integrity is required (typically
+ subject or owner information).
+ MongoDB does support foreign keys, yet their usage would result in multiple
+ queries (as it doesn't support joins).
+\end_layout
+
+\begin_layout Standard
+Therefore several options occur, each with own difficulties to overcome:
+\end_layout
+
+\begin_layout Enumerate
+Keep current solution
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+easy way to maintain data integrity
+\end_layout
+
+\begin_layout Itemize
+not a flexible data model
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Transfer all data to MongoDB 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+flexible data model
+\end_layout
+
+\begin_layout Itemize
+many problems
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+either lots of duplicate data or references
+\end_layout
+
+\begin_layout Itemize
+probably some application changes required
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+fast read queries
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+possible need for multiple queries (in case of references usage) to retrieve
+ all the data
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Enumerate
+Parallel use of both database engines
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+keep data which require relational integrity in Oracle
+\end_layout
+
+\begin_layout Itemize
+keep experiment-specific meta-data in MongoDB
+\end_layout
+
+\begin_layout Itemize
+most difficult to implement
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+probably most complicated changes to the application
+\end_layout
+
+\begin_layout Itemize
+how to query effitiently?
+\end_layout
+
+\begin_layout Itemize
+how to handle transactions?
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+The option 2 seems to be the least suitable for the project such as the
+ Portal.
+ Even though the NOSQL database provides good facility for storing neuroscience
+ experiments, it is not a good choice for current version of the Portal's
+ domain.
+ Any attempt to use solely MongoDB as the Portal's data storage would probably
+ result in large changes in the application and its domain.
+\end_layout
+
+\begin_layout Standard
+The option 1 is the safest one, while option 3 is worth further investigation
+ as it might result in a solution which would be able to combine strong
+ sides of the both concepts.
+ The recommended approach would be creating a layer between the application
+ and persistence - JPA (Hibernate) and MongoDB API.
+ At the moment it is obvious that it's not going to be a trivial task.
+\end_layout
+
+\end_body
+\end_document
