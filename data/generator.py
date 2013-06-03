@@ -1,5 +1,9 @@
 __author__ = 'Jakub Danek'
 
+"""
+This module provides functions which generate test data based on given parameters.
+"""
+
 from data.classes import *
 import oracle as oc
 
@@ -8,6 +12,10 @@ firstnameConst = "firstname"     #person firstname
 lastnameConst = "lastname"       #person lastname
 
 ### DATABASE INIT#####################################
+"""
+Drop current oracle db and initialize a new one. The amount of data generated depends
+on the parameters given.
+"""
 def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per_group, artefact_count, weather_count, subj_group_count, digit_count, electrode_count):
     print "Cleaning DB"
     oc.clear_db()
@@ -61,6 +69,10 @@ def init_oracle(lastname_count, firstname_count, group_count, scenario_count_per
     oc.save_scenarios(scenarios)
     print "Scenarios generated"
 
+"""
+Generate and save experiments for each research group member into oracle db. Number of experiments genrated per member
+depends on the parameter given.
+"""
 def generate_experiments(exp_per_member = 10):
     oc.clear_experients()
 
@@ -104,24 +116,33 @@ def generate_experiments(exp_per_member = 10):
                 exp = experiment()
                 exp.owner = m
                 exp.research_group = g
-                exp.subject, subj_index = get_item_from_dict(subjects, subj_index, subj_len)
-                exp.subject_group, subj_grp_index = get_item_from_dict(subj_groups, subj_grp_index, subj_grp_len)
-                exp.scenario, scenario_index = get_item_from_dict(scenarios, scenario_index, scenario_len)
-                exp.weather, weather_index = get_item_from_dict(weathers, weather_index, weather_len)
-                exp.artefact, artefact_index = get_item_from_dict(artefacts, artefact_index, artefact_len)
-                exp.electrode, electrode_index = get_item_from_dict(electrodes, electrode_index, electrode_len)
-                exp.digitization, digit_index = get_item_from_dict(digits, digit_index, digit_len)
+                exp.subject, subj_index = _get_item_from_dict(subjects, subj_index, subj_len)
+                exp.subject_group, subj_grp_index = _get_item_from_dict(subj_groups, subj_grp_index, subj_grp_len)
+                exp.scenario, scenario_index = _get_item_from_dict(scenarios, scenario_index, scenario_len)
+                exp.weather, weather_index = _get_item_from_dict(weathers, weather_index, weather_len)
+                exp.artefact, artefact_index = _get_item_from_dict(artefacts, artefact_index, artefact_len)
+                exp.electrode, electrode_index = _get_item_from_dict(electrodes, electrode_index, electrode_len)
+                exp.digitization, digit_index = _get_item_from_dict(digits, digit_index, digit_len)
                 exps.append(exp)
     print "Experiments generated, insering into DB"
     oc.save_experiments(exps)
     print "Experiments saved in the DB"
 
-def get_item_from_dict(dict, index, length):
+"""
+Returns a tuple - item in the dictionary on the given index and new index (incremented, starts from 0 in
+case of overflow)
+"""
+def _get_item_from_dict(dict, index, length):
     return dict[index], (index + 1) % length
 
 
 
 ### DATA GENERATORS###################################
+"""
+Generates person instances - all combinations of firstnames and latnames.
+
+Number of names depends on parameters given.
+"""
 def generate_persons(firstname_count, lastname_count):
     persons = []
 
@@ -134,6 +155,10 @@ def generate_persons(firstname_count, lastname_count):
 
     return persons
 
+"""
+Generates research groups - amount based on the title_count parameter.
+Group owner is taken from the list passed as paramater.
+"""
 def generate_research_groups(title_count, owners):
     titleConst = "researchGroup"
     descConst = "researchGroupDescription"
@@ -151,6 +176,10 @@ def generate_research_groups(title_count, owners):
 
     return groups
 
+"""
+Generates scenarios for each group from the passed list.
+Number of scenarios per group depends on the title_count_per_group parameter.
+"""
 def generate_scenarios(title_count_per_group, groups):
     titleConst = "scenario"
     descConst = "scenarioDescription"
@@ -167,6 +196,10 @@ def generate_scenarios(title_count_per_group, groups):
 
     return scenarios
 
+"""
+Generate artefacts. Number of artefacts depends on the compensation_count parameter.
+reject_param sets how many different reject values will occure within the data.
+"""
 def generate_artefacts(compensation_count, reject_param=5):
     compensation_const = "compensation"
     reject_const = "reject"
@@ -178,6 +211,9 @@ def generate_artefacts(compensation_count, reject_param=5):
 
     return artefacts
 
+"""
+Generate weather instances - amount depends on the title_count
+"""
 def generate_weathers(title_count):
     title_const = "weather"
     desc_const = "weather description"
@@ -189,6 +225,9 @@ def generate_weathers(title_count):
 
     return weathers
 
+"""
+Generate subject group instances - amount depends on the title_count
+"""
 def generate_subject_groups(title_count):
     title_const = "subject_group"
     desc_const = "subject_group description"
@@ -200,6 +239,9 @@ def generate_subject_groups(title_count):
 
     return subject_groups
 
+"""
+Generate digitization instances - amount depends on the title_count
+"""
 def generate_digitizations(digi_count = 0):
     gain = 0
     sample = 10000
@@ -215,6 +257,9 @@ def generate_digitizations(digi_count = 0):
 
     return digits
 
+"""
+Generate electrode system instances - amount depends on the title_count
+"""
 def generate_electrode_systems(title_count):
     title_const = "electrode_system"
     desc_const = "electrode_system description"

@@ -1,4 +1,10 @@
-__author__ = 'veveri'
+__author__ = 'Jakub Daněk'
+
+"""
+This module contains datamodel of the EEG/ERP Portal.
+
+Classes can provide functions to transform their data into a dictionary (for json storage)
+"""
 
 from datetime import datetime
 

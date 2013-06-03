@@ -1,5 +1,9 @@
 __author__ = 'Jakub Danek'
 
+"""
+This module provides various queries and functions for handling oracle database.
+"""
+
 import cx_Oracle
 import utils as ut
 from data.classes import *
@@ -186,12 +190,29 @@ def save_experiments(experiments=[]):
     insert_many(experiment_insert, ut.experiments_to_matrix(experiments))
 
 """
-EXPERIMENT_ID
+The query must return EXPERIMENT_ID only
 """
 def query_experiment_ids(query, parameters=[]):
-    ret = []
     return fetch_many(query, parameters)
 
+"""
+The query must return:
+     e.EXPERIMENT_ID, e.SCENARIO_ID," \
+     " s.GIVENNAME, s.SURNAME, s.GENDER, s.LATERALITY," \
+     " w.TITLE, w.DESCRIPTION," \
+     " o.GIVENNAME, o.SURNAME, o.GENDER, o.LATERALITY," \
+     " e.RESEARCH_GROUP_ID," \
+     " a.COMPENSATION, a.REJECT_CONDITION," \
+     " sg.TITLE, sg.DESCRIPTION," \
+     " e.ELECTRODE_CONF_ID," \
+     " d.GAIN, d.FILTER, d.SAMPLING_RATE," \
+     " sc.TITLE, sc.DESCRIPTION, scp.GIVENNAME, scp.SURNAME," \
+     " rg.TITLE, rg.DESCRIPTION," \
+     " es.TITLE, es.DESCRIPTION," \
+     " o.DATE_OF_BIRTH, s.DATE_OF_BIRTH" \
+     " FROM EXPERIMENT e, PERSON s, WEATHER w, PERSON o, ARTEFACT a, SUBJECT_GROUP sg, DIGITIZATION d, SCENARIO sc, PERSON scp," \
+     "      RESEARCH_GROUP rg, ELECTRODE_CONF ec, ELECTRODE_SYSTEM es" \
+"""
 def query_experiments_full(query, parameters=[]):
     ret = []
     i = 0
@@ -219,6 +240,9 @@ def query_experiments_full(query, parameters=[]):
 
     return ret
 
+"""
+Removes all experiments from database.
+"""
 def clear_experients():
     update(experiment_clear)
 
@@ -226,17 +250,27 @@ def clear_experients():
 def save_persons(persons=[]):
     insert_many(person_insert, ut.persons_to_matrix(persons))
 
+"""
+Query must return:
+p.PERSON_ID, p.GIVENNAME, p.SURNAME, p.GENDER, p.LATERALITY, p.DATE_OF_BIRTH
+"""
 def query_persons(query, parameters=[]):
     persons = []
     for t in fetch_many(query, parameters):
         persons.append(person(t[1], t[2], t[3], t[4], t[5], t[0]))
 
     return persons
-
+"""
+Query must return:
+p.PERSON_ID, p.GIVENNAME, p.SURNAME, p.GENDER, p.LATERALITY, p.DATE_OF_BIRTH
+"""
 def query_person(query, parameters=[]):
     t = fetch_one(query, parameters)
     return  person(t[1], t[2], t[3], t[4], t[5], t[0])
 
+"""
+Remove all person instances from the db
+"""
 def clear_persons():
     update(person_clear)
 
@@ -245,9 +279,16 @@ def clear_persons():
 def save_research_groups(groups=[]):
     insert_many(research_group_insert, ut.groups_to_matrix(groups))
 
+"""
+Add persons as members to the group
+"""
 def add_res_group_members(group, persons=[]):
     insert_many(research_group_member_insert, ut.prepare_member_matrix(group, persons))
 
+"""
+Query must return:
+RESEARCH_GROUP_ID, TITLE, DESCRIPTION, OWNER_ID
+"""
 def query_groups(query, parameters=[]):
     groups = []
     for t in fetch_many(query, parameters):
@@ -256,11 +297,18 @@ def query_groups(query, parameters=[]):
 
     return groups
 
+"""
+Query must return:
+RESEARCH_GROUP_ID, TITLE, DESCRIPTION, OWNER_ID
+"""
 def query_group(query, parameters=[]):
     t = fetch_one(query, parameters)
     owner = query_person(person_select_by_id, [t[3]])
     return research_group(owner, t[1], t[2], t[0])
 
+"""
+Remove all res groups from the db
+"""
 def clear_groups():
     update(research_group_member_clear)
     update(research_group_clear)
@@ -269,6 +317,10 @@ def clear_groups():
 def save_scenarios(scenarios=[]):
     insert_many(scenario_insert, ut.scenarios_to_matrix(scenarios))
 
+"""
+Query must return:
+SCENARIO_ID, TITLE, DESCRIPTION, OWNER_ID, RESEARCH_GROUP_ID
+"""
 def query_scenarios(query, parameters=[]):
     scenarios = []
     for s in fetch_many(query, parameters):
@@ -277,8 +329,10 @@ def query_scenarios(query, parameters=[]):
         scenarios.append(scenario(owner, group, s[1], s[2], s[0]))
 
     return scenarios
-
-#"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p"
+"""
+Query must return
+"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p"
+"""
 def query_scenarios_full(query, parameters=[]):
     scenarios = []
     for s in fetch_many(query, parameters):
@@ -287,19 +341,28 @@ def query_scenarios_full(query, parameters=[]):
 
     return scenarios
 
-#"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p"
+"""
+Query must return
+"s.SCENARIO_ID, s.TITLE, s.DESCRIPTION, p.GIVENNAME, p.SURNAME, p.PERSON_ID FROM SCENARIO s, PERSON p"
+"""
 def query_scenario_full(query, parameters=[]):
     s = fetch_one(query, parameters)
     owner = person(s[3], s[4],'M','X', s[5])
     return scenario(owner, research_group(), s[1], s[2], s[0])
 
-
+"""
+Query must return:
+SCENARIO_ID, TITLE, DESCRIPTION, OWNER_ID, RESEARCH_GROUP_ID
+"""
 def query_scenario(query, parameters=[]):
     s = fetch_one(query, parameters)
     owner = query_person(person_select_by_id, [s[3]])
     group = query_group(research_group_select_by_id, [s[4]])
     return scenario(owner, group, s[1], s[2], s[0])
 
+"""
+Remove all scenarios from the db
+"""
 def clear_scenarios():
     update(scenario_clear)
 
@@ -307,6 +370,10 @@ def clear_scenarios():
 def save_artefacts(artefacts=[]):
     insert_many(artefact_insert, ut.artefacts_to_matrix(artefacts))
 
+"""
+Query must return
+ARTEFACT_ID, COMPENSATION, REJECT_CONDITION
+"""
 def query_artefacts(query, parameters=[]):
     artefacts = []
     for t in fetch_many(query, parameters):
@@ -314,6 +381,10 @@ def query_artefacts(query, parameters=[]):
 
     return artefacts
 
+"""
+Query must return
+ARTEFACT_ID, COMPENSATION, REJECT_CONDITION
+"""
 def query_artefact(query, parameters=[]):
     t = fetch_one(query, parameters)
     return artefact(t[1], t[2], t[0])
@@ -325,6 +396,10 @@ def clear_artefacts():
 def save_weather(weather=[]):
     insert_many(weather_insert, ut.weather_to_matrix(weather))
 
+"""
+Query must return
+WEATHER_ID, TITLE, DESCRIPTION
+"""
 def query_weathers(query, parameters=[]):
     weathers = []
     for t in fetch_many(query, parameters):
@@ -332,6 +407,10 @@ def query_weathers(query, parameters=[]):
 
     return weathers
 
+"""
+Query must return
+WEATHER_ID, TITLE, DESCRIPTION
+"""
 def query_weather(query, parameters=[]):
     t = fetch_one(query, parameters)
     return weather(t[1], t[2], t[0])
@@ -343,6 +422,10 @@ def clear_weathers():
 def save_subject_group(subject_group=[]):
     insert_many(subject_group_insert, ut.subject_group_to_matrix(subject_group))
 
+"""
+Query must return
+SUBJECT_GROUP_ID, TITLE, DESCRIPTION
+"""
 def query_subject_groups(query, parameters=[]):
     subject_groups = []
     for t in fetch_many(query, parameters):
@@ -350,6 +433,11 @@ def query_subject_groups(query, parameters=[]):
 
     return subject_groups
 
+
+"""
+Query must return
+SUBJECT_GROUP_ID, TITLE, DESCRIPTION
+"""
 def query_subject_group(query, parameters=[]):
     t = fetch_one(query, parameters)
     return subject_group(t[1], t[2], t[0])
@@ -361,6 +449,10 @@ def clear_subject_groups():
 def save_digitalization(digit = []):
     insert_many(digitization_insert, ut.digitization_to_matrix(digit))
 
+"""
+Query must return
+DIGITIZATION_ID, GAIN, FILTER, SAMPLING_RATE
+"""
 def query_digitizations(query, parameters=[]):
     digits = []
     for t in fetch_many(query, parameters):
@@ -368,6 +460,10 @@ def query_digitizations(query, parameters=[]):
 
     return digits
 
+"""
+Query must return
+DIGITIZATION_ID, GAIN, FILTER, SAMPLING_RATE
+"""
 def query_digitization(query, paramters=[]):
     t = fetch_one(query, paramters)
     return digitization(t[1], t[2], t[3], t[0])
@@ -380,6 +476,10 @@ def save_electrode_system(electrode_system=[]):
     insert_many(electrode_system_insert, ut.electrode_system_to_matrix(electrode_system))
     insert_many(electrode_conf_insert, ut.electrode_system_ids_to_matrix(query_electrode_systems(electrode_system_select_all)))
 
+"""
+Query must return
+ELECTRODE_SYSTEM_ID, TITLE, DESCRIPTION
+"""
 def query_electrode_systems(query, parameters=[]):
     electrode_systems = []
     for t in fetch_many(query, parameters):
@@ -387,10 +487,18 @@ def query_electrode_systems(query, parameters=[]):
 
     return electrode_systems
 
+"""
+Query must return
+ELECTRODE_SYSTEM_ID, TITLE, DESCRIPTION
+"""
 def query_electrode_system(query, parameters=[]):
     t = fetch_one(query, parameters)
     return electrode_system(t[1], t[2], t[0])
 
+"""
+Query must return
+c.ELECTRODE_CONF_ID, s.ELECTRODE_SYSTEM_ID, s.TITLE, s.DESCRIPTION FROM ELECTRODE_CONF c, ELECTRODE_SYSTEM
+"""
 def query_electrode_confs(query, parameters=[]):
     electrode_confs = []
     for t in fetch_many(query, parameters):
@@ -398,6 +506,10 @@ def query_electrode_confs(query, parameters=[]):
 
     return electrode_confs
 
+"""
+Query must return
+c.ELECTRODE_CONF_ID, s.ELECTRODE_SYSTEM_ID, s.TITLE, s.DESCRIPTION FROM ELECTRODE_CONF c, ELECTRODE_SYSTEM
+"""
 def query_electrode_conf(query, parameters=[]):
     t = fetch_one(query, parameters)
     return electrode_system(t[2], t[3], t[1], t[0])

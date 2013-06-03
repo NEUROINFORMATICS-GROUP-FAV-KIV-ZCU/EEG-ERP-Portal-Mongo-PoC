@@ -331,7 +331,7 @@ Search by scenario name (single join in Oracle)
 \end_layout
 
 \begin_layout Enumerate
-Search by name of a research group (two joins in Oracle)
+Search by name of a research group's owner (two joins in Oracle)
 \end_layout
 
 \begin_layout Enumerate
@@ -340,17 +340,23 @@ Search by age of a subject (aggregation function in Oracle, date comparison
 \end_layout
 
 \begin_layout Standard
-Test iteration consisted of 100 queries in a row, which were run in parallel
- (in 1, 2, 4, 8, 16 and 32 threads).
- As a result 100 (200, 400, ..., 3200) queries had been run.
- For MongoDB six iterations were run without indexes, followed by six iterations
- with indexes created.
- For Oracle, all 12 iterations were run with indexes created for the relevant
- columns.
+Each test process consisted of 100 queries in a row.
+ In each iteration the tests were run in 1, 2, 4, 8, 16 and 32 parallel
+ processes.
+ Therefore 100, 200, 400, 800, 1600 and 3200 queries had been run in each
+ iteration.
+ Detailed results can be found in the attached files (results.pdf and results_ind.
+pdf).
+ Each file contains two tables per test case (one for MongoDB, one for Oracle).
+ One row in each table represents one iteration.
+ Each column represents number of parallel processes.
 \end_layout
 
 \begin_layout Standard
-See attached tables for detailed results.
+For MongoDB six iterations were run without indexes (file results.pdf), followed
+ by six iterations with indexes created (file results_ind.pdf).
+ For Oracle, all 12 iterations were run with indexes created for the relevant
+ columns.
 \end_layout
 
 \begin_layout Standard
@@ -364,6 +370,10 @@ MongoDB returns results on average 2-3 times faster than Oracle in most
 
 \begin_layout Itemize
 Indexes in MongoDB didnt seem to have any significant effect on performance.
+\begin_inset Newpage clearpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
@@ -418,6 +428,13 @@ Oracle experienced significant performance jumps during iterations, for
 \end_deeper
 \begin_layout Subsection
 Flexibility
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Flexibility"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -445,6 +462,10 @@ easy way to maintain data integrity
 
 \begin_layout Itemize
 not a flexible data model
+\begin_inset Newpage clearpage
+\end_inset
+
+
 \end_layout
 
 \end_deeper
@@ -488,6 +509,11 @@ Parallel use of both database engines
 \end_layout
 
 \begin_deeper
+\begin_layout Enumerate
+in one application - cooperation on the Portal's data layer
+\end_layout
+
+\begin_deeper
 \begin_layout Itemize
 keep data which require relational integrity in Oracle
 \end_layout
@@ -515,6 +541,37 @@ how to handle transactions?
 
 \end_deeper
 \end_deeper
+\begin_layout Enumerate
+separate data warehouse
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+architecture taken from the StorageBIT proposal 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "StorageBit"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+implement separate experiment data storage on top of MongoDB and access
+ it from the Portal via public API
+\end_layout
+
+\begin_layout Itemize
+would require changes in the Portal's application structure
+\end_layout
+
+\begin_layout Itemize
+similar integrity issues as with (a)
+\end_layout
+
+\end_deeper
+\end_deeper
 \begin_layout Standard
 The option 2 seems to be the least suitable for the project such as the
  Portal.
@@ -532,6 +589,69 @@ The option 1 is the safest one, while option 3 is worth further investigation
  The recommended approach would be creating a layer between the application
  and persistence - JPA (Hibernate) and MongoDB API.
  At the moment it is obvious that it's not going to be a trivial task.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Summary
+\end_layout
+
+\begin_layout Standard
+During the experiment it has been confirmed that MongoDB is an eligible
+ solution for storing neuroscience data, as claimed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "StorageBit"
+
+\end_inset
+
+.
+ Thanks to its flexible nature, the database doesn't limit researches by
+ number or structure of stored meta-data.
+ In addition MongoDB provides fast querying and insertion.
+\end_layout
+
+\begin_layout Standard
+However transition from the current solution to the one proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "StorageBit"
+
+\end_inset
+
+ is not going to be a simple one, because the proposal doesn't consider
+ an application of the Portal's size and complexity.
+ It seems unlikely that the Portal can work without maintaining referential
+ integrity for some pieces of information.
+ Therefore one of the options proposed in this paper (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Flexibility"
+
+\end_inset
+
+) should be considered.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "1"
+key "StorageBit"
+
+\end_inset
+
+ Carlos Carreiras, Hugo Silva, Andreé Lourencco and Ana Fred.
+ StorageBIT: A metadata-aware, extensible, semantic and hierarchical database
+ for biosignals.
+ In Proceeding of the 6th Conference on Health Informatics (HEALTHINF),
+ 2013
 \end_layout
 
 \end_body

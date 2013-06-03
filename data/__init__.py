@@ -1,1 +1,1 @@
-__author__ = 'veveri'
+__author__ = 'Jakub Daněk'

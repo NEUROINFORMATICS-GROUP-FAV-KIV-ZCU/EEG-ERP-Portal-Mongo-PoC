@@ -1,6 +1,9 @@
 __author__ = 'Jakub Danek'
 
-from data.classes import *
+"""
+These functions transform data into matrix so that they can be used as parameters
+for oracle input queries.
+"""
 
 def persons_to_matrix(persons=[]):
     ret = []

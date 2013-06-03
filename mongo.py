@@ -1,19 +1,23 @@
 __author__ = 'Jakub Danek'
+"""
+Functions for operating mongodb instance.
+"""
 
 from pymongo import MongoClient
 import json
 from pprint import pprint
 
-json_data = open('data/schema.json')
-data = json.load(json_data)
-json_data.close()
-
-
+#init db connection
 client = MongoClient()
 db = client.db_experiment
 collection = db.experiments
 
 
+"""
+Converts provided exps list (list of experiments) into a dictionary form and stores
+it in the mongo db.
+Saves the data in several bulks to avoid maximum message size problem.
+"""
 def init_mongo(exps=[]):
     collection.drop()
     list = []
@@ -27,11 +31,18 @@ def init_mongo(exps=[]):
             list = []
     print "MONGO data finished."
 
+"""
+Insert provided dictionary set into the db.
+"""
 def insert_many(data=None):
     if(data == None):
         return None
 
     return collection.insert(data)
 
+"""
+Returns list of experiment ids based on search dictionary.
+See mongoDB documentation for dictionary structure.
+"""
 def find_ids(searchDictionary = {}):
      return list(collection.find(searchDictionary, {"experiment_id" : 1, "_id" : 0}))
